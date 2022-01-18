@@ -1,0 +1,23 @@
+{
+  "name": "rename-pck",
+  "version": "1.0.1",
+  "description": "test package",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "standard"
+  },
+  "keywords": [
+    "test",
+    "npm"
+  ],
+  "author": "Saurabh",
+  "license": "ISC",
+  "dependencies": {
+    "pino": "^7.4.0"
+  },
+  "devDependencies": {
+    "standard": "^16.0.4"
+  }
+}

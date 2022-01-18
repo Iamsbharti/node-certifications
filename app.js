@@ -38,3 +38,15 @@ obj2.fn.call({ id: 89 }); // 89
 /**
  * call method on function dynamically sets the this context
  */
+
+// closure scope concept
+function prefixer(value) {
+  return (name) => {
+    return value + name;
+  };
+}
+const sayHiTo = prefixer("Hello ");
+const sayByeTo = prefixer("Goodbye ");
+console.log(sayHiTo("Dave")); // prints 'Hello Dave'
+console.log(sayHiTo("Annie")); // prints 'Hello Annie'
+console.log(sayByeTo("Dave")); // prints 'Goodbye Dave'

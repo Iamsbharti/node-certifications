@@ -40,3 +40,18 @@ emitter.prependListener("third", (c) => console.log("THIRD EVENT::", c));
 
 emitter.emit("third", "3rd event");
 emitter.emit("fourth", "4th event");
+
+// an event can be emitted more than once
+
+emitter.on("more", () => console.log("Event multiple fired"));
+emitter.emit("more");
+emitter.emit("more");
+emitter.emit("more");
+
+// multiple event firing can be restricted using once , when this is used listeners are
+// the "once" method will immediately remove its listener after it has been called:
+
+emitter.once("once", () => console.log("Event once fired"));
+emitter.emit("once");
+emitter.emit("once");
+emitter.emit("once");

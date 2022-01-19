@@ -1,4 +1,6 @@
 const EventEmitter = require("events");
+const { exit } = require("process");
+const { getSystemErrorMap } = require("util");
 
 const emitter = new EventEmitter();
 
@@ -100,9 +102,26 @@ setInterval(() => {
 }, 200);
 
 setTimeout(() => {
+  console.log("Removing my-event listeners");
   emitter.removeAllListeners("my-event");
 }, 500);
 
 setTimeout(() => {
+  console.log("Removing all listeners");
   emitter.removeAllListeners();
+  exit();
 }, 1100);
+
+// The "error" Event
+/**
+ * Emitting an 'error' event on an event emitter will cause the event emitter to
+ * throw an exception if a listener for the 'error' event has not been registered:
+ */
+const errorEventEmitter = new EventEmitter();
+
+process.stdin.resume(); // keeps the process alive
+// listen to error event
+errorEventEmitter.on("error", (err) =>
+  console.log("ERROR EVENT MSG:::", err.message)
+);
+errorEventEmitter.emit("error", new Error("Error event emitted"));

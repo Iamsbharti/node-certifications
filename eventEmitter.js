@@ -49,9 +49,60 @@ emitter.emit("more");
 emitter.emit("more");
 
 // multiple event firing can be restricted using once , when this is used listeners are
-// the "once" method will immediately remove its listener after it has been called:
+// the "once" method will immediately remove its listener after it has bemittern called:
 
 emitter.once("once", () => console.log("Event once fired"));
 emitter.emit("once");
 emitter.emit("once");
 emitter.emit("once");
+
+// Removing listeners
+const listener1 = () => {
+  console.log("Listener 1");
+};
+const listener2 = () => {
+  console.log("Listener 2");
+};
+
+emitter.on("remove-test", listener1);
+emitter.on("remove-test", listener2);
+
+setInterval(() => {
+  console.log("Emitting event--");
+  emitter.emit("remove-test");
+}, 200);
+setTimeout(() => {
+  console.log("removing listener 1");
+  emitter.removeListener("remove-test", listener1);
+}, 500);
+setTimeout(() => {
+  console.log("removing listener 2");
+  emitter.removeListener("remove-test", listener2);
+}, 1100);
+
+// remove all listeners
+const listener3 = () => {
+  console.log("listener 1");
+};
+const listener4 = () => {
+  console.log("listener 2");
+};
+
+emitter.on("my-event", listener3);
+emitter.on("my-event", listener4);
+emitter.on("another-event", () => {
+  console.log("another event");
+});
+
+setInterval(() => {
+  emitter.emit("my-event");
+  emitter.emit("another-event");
+}, 200);
+
+setTimeout(() => {
+  emitter.removeAllListeners("my-event");
+}, 500);
+
+setTimeout(() => {
+  emitter.removeAllListeners();
+}, 1100);

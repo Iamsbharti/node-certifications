@@ -111,3 +111,47 @@ try {
  * it won't work because, try/catch statements would have been executed long before the callback is called.
  * use try/catch inside the callback statements to remove the above anti-pattern.
  */
+//--------------------ASYNCHRONOUS ERROR HANDLING---------------------//
+function doTaskAsync(amount) {
+  return new Promise((resolve, reject) => {
+    if (typeof amount !== "number") {
+      reject(new TypeError("Amount should be a number"));
+      return;
+    }
+    if (amount <= 0) {
+      reject(new RangeError("Amount should be greater than 0"));
+    }
+    if (amount % 2) {
+      reject(new OddError("Amount can not be odd"));
+    }
+    resolve(amount / 2);
+  });
+}
+// doTaskAsync(3); -> this gives unhandled promose reject warning; we can handle this using then/catch
+
+doTaskAsync(2)
+  .then(() => {
+    throw Error("SUCCESS RETHROw");
+  })
+  .catch((err) => {
+    if (err.code === "ERR_AMOUNT_MUST_BE_NUMBER") {
+      console.error("wrong type");
+    } else if (err.code === "ERRO_AMOUNT_MUST_EXCEED_ZERO") {
+      console.error("out of range");
+    } else if (err.code === "ERR_MUST_BE_EVEN") {
+      console.error("cannot be odd");
+    } else {
+      console.error("Unknown error", err);
+    }
+  });
+/**
+ * It's very important to realize that when the throw appears inside a promise handler,
+ * that will not be an exception, that is it won't be an error that is synchronous.
+ * Instead it will be a rejection, the then or catch handler will return a new promise that
+ * rejects as a result of a throw within a handler.
+ */
+
+// Error Propagation
+/**
+ * Error propagation is where, instead of handling the error, we make it the responsibility of the caller instead.
+ */

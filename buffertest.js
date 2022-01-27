@@ -138,7 +138,10 @@ console.log(
 /**
  * When deserializing, JSON.parse will only turn that JSON representation of the
  * buffer into a plain JavaScript object, to turn it into an object the data array
- * must be passed to Buffer.from:
+ * must be passed to Buffer.from.
+ *
+ * When an array of numbers is passed to Buffer.from they are converted to a
+ * buffer with byte values corresponding to those numbers.
  */
 const bufferSerialization = Buffer.from("👀");
 const json = JSON.stringify(bufferSerialization);

@@ -26,7 +26,7 @@ const writable = createWritable();
 // with a transform stream that uppercases
 // incoming characters
 const transform = new Transform({
-  write(chunk, enc, next) {
+  transform(chunk, enc, next) {
     next(null, chunk.toString().toUpperCase());
   },
 });

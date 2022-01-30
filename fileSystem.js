@@ -158,3 +158,176 @@ pipeline(
     console.log("finished writing");
   }
 );
+
+//************************** Reading Directories *************************/
+/**
+ * Directories are special type of file, which holds a cataloge of files.
+ * Similar to files fs provides multiple ways to read a directory.
+ * 
+ *  - Synchronous
+    - Callback-based
+    - Promise-based
+    - An async iterable that inherits from fs.Dir
+ * 
+ */
+const { readdirSync, readdir } = require("fs");
+const { readdir: readDirProm } = require("fs").promises;
+// synchronous
+try {
+  console.log("sync dir::", readdirSync(__dirname));
+} catch (error) {
+  console.log("error reading dir::", error);
+}
+// callback based
+readdir(__dirname, (error, files) => {
+  if (error) {
+    console.log("error reading dir callback::", error);
+  } else {
+    console.log("Read dir callback::", files);
+  }
+});
+// async
+async function fooRun() {
+  const files = await readDirProm(__dirname);
+  console.log("Async dir read::", files);
+}
+fooRun().catch((error) => console.log("Error reading dir async::", error));
+
+/**
+ * for extremly large directories:
+ * - fs.opendir ,fs.opendirSync or fs.promises.opendir can be used to read as streams.
+ * - these methods provides a stream-like interface that we can pass to Readable.from to turn it into a stream
+ */
+/** 
+  const { createServer } = require("http");
+  const { Readable } = require("stream");
+  const { opendir } = require("fs");
+
+  const createEntryStream = () => {
+    let syntax = "[\n";
+    return new Transform({
+      writableObjectMode: true,
+      readableObjectMode: false,
+      transform(entry, enc, next) {
+        next(null, `${syntax} "${entry.name}"`);
+        syntax = ",\n";
+      },
+      final(cb) {
+        this.push("\n]\n");
+        cb();
+      },
+    });
+  };
+
+  createServer((req, res) => {
+    if (req.url !== "/") {
+      res.statusCode = 404;
+      res.end("Not Found");
+      return;
+    }
+    opendir(__dirname, (err, dir) => {
+      if (err) {
+        res.statusCode = 500;
+        res.end("Server Error");
+        return;
+      }
+      const dirStream = Readable.from(dir);
+      const entryStream = createEntryStream();
+      res.setHeader("Content-Type", "application/json");
+      pipeline(dirStream, entryStream, res, (err) => {
+        if (err) console.error(err);
+      });
+    });
+  }).listen(3000);
+*/
+// ******************** Files metadata *******************************//
+/**
+ * metadata of files can be found using these methods::
+ * - fs.stat, fs.statSync, fs.promises.stat
+ * - fs.lstat, fs.lstatSync, fs.promises.lstat
+ *
+ * difference between stat and lstat methods is that
+ * - stat follows symbolic links, and
+ * - lstat will get meta data for symbolic links instead of following them.
+ *
+ * These methods return an fs.Stat instance which has a variety of properties and
+ * methods for looking up metadata about a file.
+ */
+const { statSync } = require("fs");
+const files = readdirSync(__dirname);
+for (let file of files) {
+  const stat = statSync(file);
+  console.log("File typelabel::", stat.isDirectory() ? "dir" : "file", file);
+}
+/**
+ * There are four stats available for files:
+   - Access time
+   - Change time
+   - Modified time
+   - Birth time
+ * The difference between change time and "modified" time, is modified time only applies to writes.
+ * whereas "change" time applies to writes and any status changes such as changing permissions or ownership.
+ * With default options, the time stats are offered in two formats: 
+ * - Date object 
+ * - milliseconds since the epoch.
+ */
+// print file time metadata
+for (const file of files) {
+  const stat = statSync(file);
+  const typeLabel = stat.isDirectory() ? "dir" : "file";
+  const { atime, mtime, ctime, birthtime } = stat;
+  console.group(typeLabel, file);
+  console.log("Access time::", atime.toLocaleDateString());
+  console.log("Modified time::", mtime.toLocaleTimeString());
+  console.log("Change time::", ctime.toLocaleDateString());
+  console.log("BirthTime::", birthtime.toLocaleTimeString());
+  console.groupEnd();
+  console.log();
+}
+
+/******************** FILE Watching  ********************************/
+/**
+ * fs.watch method is provided by Node core to tap into file system events.
+ * it's a low level api, for production or more user friendly use chokidar.
+ *
+ */
+const { watch } = require("fs");
+watch(".", (event, filename) => {
+  console.log("WATCHER::", event, filename);
+});
+/**
+ * Creating a new file named test (node -e "fs.writeFileSync('test', 'test')") generates an event called rename.
+   Creating a folder called test-dir (node -e "fs.mkdirSync('test-dir')") generates an event called rename.
+   Setting the permissions of test-dir (node -e "fs.chmodSync('test-dir', 0o644)") generates an event called rename.
+   Writing the same content to the test file (node -e "fs.writeFileSync('test', 'test')") generates an event named change.
+   Setting the permissions of test-dir (node -e "fs.chmodSync('test-dir', 0o644)") a second time generates a change event this time.
+   Deleting the test file (node -e "fs.unlinkSync('test')") generates a rename event.
+ */
+/**
+   * const { join, resolve } = require('path')
+  const { watch, readdirSync, statSync } = require('fs')
+
+  const cwd = resolve('.')
+  const files = new Set(readdirSync('.'))
+  watch('.', (evt, filename) => {
+    try {
+      const { ctimeMs, mtimeMs } = statSync(join(cwd, filename))
+      if (files.has(filename) === false) {
+        evt = 'created'
+        files.add(filename)
+      } else {
+        if (ctimeMs === mtimeMs) evt = 'content-updated'
+        else evt = 'status-updated'
+      }
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        files.delete(filename)
+        evt = 'deleted'
+      } else {
+        console.error(err)
+      }
+    } finally {
+      console.log(evt, filename)
+    }
+  })
+ */

@@ -1,3 +1,11 @@
 /my-pacakage/node_modules
 /labs/ch-6/labs-1/node_modules
 /labs/ch-6/labs-2/node_modules
+/labs/ch-16/labs-1/node_modules
+/labs/ch-16/labs-2/node_modules
+/labs/ch-16/labs-3/node_modules
+/labs/ch-16/labs-1/.nyc_output
+/labs/ch-16/labs-2/.nyc_output
+/labs/ch-16/labs-3/.nyc_output
+/pureLibraryTestModule/node_modules
+/pureLibraryTestModule/.nyc_output

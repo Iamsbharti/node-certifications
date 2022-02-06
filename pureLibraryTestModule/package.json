@@ -1,15 +1,17 @@
 {
-  "name": "labs-1",
+  "name": "pureLibaryTestModule",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "tap"
+    "test-jest": "jest --coverage",
+    "test-tap": "tap"
   },
   "keywords": [],
   "author": "",
-  "license": "UNLICENSED",
+  "license": "ISC",
   "devDependencies": {
+    "jest": "^27.5.0",
     "tap": "^15.1.6"
   }
 }
